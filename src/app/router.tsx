@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import Dashboard from "@/modules/dashboard/components/Dashboard";
+import MainLayout from "@/shared/components/MainLayout";
 import ErrorPage from "@/shared/components/ErrorPage";
 import Login from "@/modules/auth/components/Login";
 
@@ -9,7 +9,7 @@ const router = createBrowserRouter([
     },
     {
         path: "/",
-        element: <Dashboard />,
+        element: <MainLayout />,
         errorElement: <ErrorPage />,
     }
 ]);
