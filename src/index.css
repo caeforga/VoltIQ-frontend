@@ -4,10 +4,6 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Paleta de marca VoltIQ
-     - Navy:   #041a34  ≈ oklch(0.20 0.05 252)
-     - Cyan:   #80e9fe  ≈ oklch(0.88 0.10 217)
-     Light theme: blancos con tinte cyan, primarios cyan profundo. */
   --background: oklch(0.9900 0.0050 220);
   --foreground: oklch(0.2000 0.0500 252);
   --card: oklch(1.0000 0 0);
@@ -63,9 +59,6 @@
 }
 
 .dark {
-  /* Dark theme — coherente con el shader del login.
-     Fondos: navys profundos derivados de #041a34.
-     Acentos: cyan eléctrico #80e9fe. */
   --background: oklch(0.1600 0.0500 252);
   --foreground: oklch(0.9500 0.0200 220);
   --card: oklch(0.2200 0.0500 252);
@@ -82,9 +75,6 @@
   --accent-foreground: oklch(0.9200 0.0600 217);
   --destructive: oklch(0.6368 0.2078 25.3313);
   --destructive-foreground: oklch(1.0000 0 0);
-  /* Bordes muy sutiles: misma familia navy pero con muy poco chroma para
-     que el reset global * { border-color: var(--border) } no resalte
-     en elementos con border-width 0. */
   --border: oklch(0.2800 0.0150 240);
   --input: oklch(0.2800 0.0150 240);
   --ring: oklch(0.8800 0.1000 217);
