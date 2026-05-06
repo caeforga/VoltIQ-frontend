@@ -1,15 +1,17 @@
 import * as React from "react"
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
-import { SidebarSeparator } from "@/components/ui/sidebar"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CalculatorIcon, BookMarkedIcon, RulerDimensionLineIcon, WaypointsIcon } from "lucide-react"
 
@@ -128,7 +130,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarSeparator />
+
       <SidebarContent>
+        <SidebarGroup className="pb-0">
+          <SidebarGroupLabel className="h-auto whitespace-normal py-2 text-[0.7rem] font-semibold leading-tight tracking-wider text-sidebar-foreground/60 uppercase">
+            Sistema de análisis de redes eléctricas de distribución
+          </SidebarGroupLabel>
+        </SidebarGroup>
         <NavMain items={data.navMain} />
         {/* <NavDocuments items={data.documents} /> */}
         {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
