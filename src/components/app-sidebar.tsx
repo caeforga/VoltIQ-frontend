@@ -13,6 +13,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar"
+import { cn } from "@/lib/utils"
 import { FolderGit2, HousePlugIcon } from "lucide-react"
 
 const data = {
@@ -43,27 +44,36 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
+              className={cn(
+                "data-[slot=sidebar-menu-button]:p-1.5!",
+                "group-data-[collapsible=icon]:h-14!",
+                "group-data-[collapsible=icon]:w-full!",
+                "group-data-[collapsible=icon]:justify-center!",
+                "group-data-[collapsible=icon]:p-2!",
+              )}
             >
               <a href="#">
-                {/* <CommandIcon className="size-5!" /> */}
-                <img src="/ico.svg" alt="VoltIQ Power Suite" className="size-5!" />
-                <span className="text-base font-semibold">VoltIQ Power Suite.</span>
+                <img
+                  src="/ico.svg"
+                  alt="VoltIQ Power Suite"
+                  className="size-5! group-data-[collapsible=icon]:size-9!"
+                />
+                <span className="text-base font-semibold group-data-[collapsible=icon]:hidden">VoltIQ Power Suite.</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarSeparator />
+      <SidebarSeparator className="group-data-[collapsible=icon]:hidden" />
 
       <SidebarContent>
-        <SidebarGroup className="pb-0">
+        <SidebarGroup className="pb-0 group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel className="h-auto whitespace-normal py-2 text-[0.7rem] font-semibold leading-tight tracking-wider text-sidebar-foreground/60 uppercase">
             Sistema de análisis de redes eléctricas de distribución
           </SidebarGroupLabel>
