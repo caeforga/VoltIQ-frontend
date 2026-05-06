@@ -13,7 +13,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar"
-import { Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CalculatorIcon, BookMarkedIcon, RulerDimensionLineIcon, WaypointsIcon } from "lucide-react"
+import { FolderGit2, HousePlugIcon } from "lucide-react"
 
 const data = {
   user: {
@@ -23,91 +23,22 @@ const data = {
   },
   navMain: [
     {
-      title: "Calcular red",
-      url: "RedCalculator",
+      title: "Inicio",
+      url: "/init",
       icon: (
-        <CalculatorIcon
+        <HousePlugIcon
         />
       ),
     },
     {
-      title: "Validar norma",
-      url: "NormaValidator",
+      title: "Proyectos",
+      url: "/projects",
       icon: (
-        <BookMarkedIcon
-        />
-      ),
-    },
-    {
-      title: "Calcular materiales",
-      url: "MaterialsCalculator",
-      icon: (
-        <RulerDimensionLineIcon
-        />
-      ),
-    },
-    {
-      title: "Dibujar red",
-      url: "RedDrawer",
-      icon: (
-        <WaypointsIcon
+        <FolderGit2
         />
       ),
     }
-  ],
-  
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: (
-        <Settings2Icon
-        />
-      ),
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: (
-        <CircleHelpIcon
-        />
-      ),
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: (
-        <SearchIcon
-        />
-      ),
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: (
-        <DatabaseIcon
-        />
-      ),
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: (
-        <FileChartColumnIcon
-        />
-      ),
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: (
-        <FileIcon
-        />
-      ),
-    },
-  ],
+  ]
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -138,8 +69,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupLabel>
         </SidebarGroup>
         <NavMain items={data.navMain} />
-        {/* <NavDocuments items={data.documents} /> */}
-        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
