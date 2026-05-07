@@ -24,16 +24,16 @@ const data = {
   },
   navMain: [
     {
-      title: "Inicio",
-      url: "/init",
+      title: "Crear proyecto",
+      url: "/create-project",
       icon: (
         <HousePlugIcon
         />
       ),
     },
     {
-      title: "Proyectos",
-      url: "/projects",
+      title: "Mis proyectos",
+      url: "/my-projects",
       icon: (
         <FolderGit2
         />
