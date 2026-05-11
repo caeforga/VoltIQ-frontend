@@ -2,21 +2,22 @@ import { z } from "zod"
 
 export const TIPO_CARGA = [
   "residencial",
-  "comercial",
-  "industrial",
-  "oficial",
+  "comercial"
 ] as const
 
 export const ESTRATOS = [1, 2, 3, 4, 5, 6] as const
+
+export const FACTOR_POTENCIA = [0.8, 0.9, 0.95] as const
 
 export const loadSchema = z.object({
   potenciaTotalKW: z.coerce
     .number({ message: "Debe ser un número" })
     .positive("Debe ser mayor a 0"),
   factorPotencia: z.coerce
-    .number({ message: "Debe ser un número" })
-    .min(0.5, "Mínimo 0,5")
-    .max(1, "Máximo 1"),
+    .number({ message: "Seleccione el factor de potencia" })
+    .refine((v) => (FACTOR_POTENCIA as readonly number[]).includes(v), {
+      message: "Seleccione el factor de potencia",
+    }),
   tipoCarga: z.enum(TIPO_CARGA, {
     message: "Seleccione el tipo de carga",
   }),
@@ -36,7 +37,5 @@ export type LoadDataInput = z.input<typeof loadSchema>
 
 export const TIPO_CARGA_LABELS: Record<(typeof TIPO_CARGA)[number], string> = {
   residencial: "Residencial",
-  comercial: "Comercial",
-  industrial: "Industrial",
-  oficial: "Oficial",
+  comercial: "Comercial"
 }

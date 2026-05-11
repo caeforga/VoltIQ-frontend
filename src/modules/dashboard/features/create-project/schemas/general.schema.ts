@@ -1,7 +1,12 @@
 import { z } from "zod"
 
-export const TIPO_RED = ["MT", "BT", "MIXTA"] as const
-export const TIPO_INSTALACION = ["aerea", "subterranea"] as const
+export const TIPO_RED = ["MT", "BT", "TR", "MIXTA"] as const
+export const TIPO_INSTALACION = ["aerea", "subterranea", "mixta"] as const
+export const TIPO_SISTEMA = [
+  "MONO_120",
+  "MONO_120_220",
+  "TRI_120_240",
+] as const
 
 export const generalSchema = z.object({
   proyecto: z
@@ -22,6 +27,9 @@ export const generalSchema = z.object({
   tipoInstalacion: z.enum(TIPO_INSTALACION, {
     message: "Seleccione el tipo de instalación",
   }),
+  tipoSistema: z.enum(TIPO_SISTEMA, {
+    message: "Seleccione el tipo de sistema",
+  }),
   nivelTensionMT: z.coerce
     .number({ message: "Debe ser un número" })
     .positive("Debe ser mayor a 0"),
@@ -40,7 +48,8 @@ export type GeneralDataInput = z.input<typeof generalSchema>
 export const TIPO_RED_LABELS: Record<(typeof TIPO_RED)[number], string> = {
   MT: "Media tensión",
   BT: "Baja tensión",
-  MIXTA: "Mixta (MT + BT)",
+  TR: "Transformadores",
+  MIXTA: "Mixta (MT + BT + TR)",
 }
 
 export const TIPO_INSTALACION_LABELS: Record<
@@ -49,6 +58,16 @@ export const TIPO_INSTALACION_LABELS: Record<
 > = {
   aerea: "Aérea",
   subterranea: "Subterránea",
+  mixta: "Mixta (Aérea + Subterránea)",
+}
+
+export const TIPO_SISTEMA_LABELS: Record<
+  (typeof TIPO_SISTEMA)[number],
+  string
+> = {
+  MONO_120: "Monofásico 120V",
+  MONO_120_220: "Monofásico 120V/220V",
+  TRI_120_240: "Trifásico 120V/240V",
 }
 
 export const OPERADORES_POR_DEPARTAMENTO: Record<string, string[]> = {

@@ -13,18 +13,15 @@ export const InputWithUnit = forwardRef<HTMLInputElement, InputWithUnitProps>(
     }
 
     return (
-      <div className="flex w-full">
+      <div className="relative w-full">
         <Input
           ref={ref}
-          className={cn(
-            "rounded-r-none border-r-0 focus-visible:z-10",
-            className,
-          )}
+          className={cn("pr-12", className)}
           {...props}
         />
-        <span className="inline-flex shrink-0 items-center rounded-r-md border border-input bg-muted px-3 text-sm text-muted-foreground">
+        <div className="pointer-events-none absolute inset-y-px right-px flex items-center rounded-r-[calc(var(--radius)-1px)] border-l border-input px-3 text-sm text-muted-foreground">
           {unit}
-        </span>
+        </div>
       </div>
     )
   },

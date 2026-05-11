@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,6 +24,7 @@ import {
   TIPO_CARGA,
   TIPO_CARGA_LABELS,
   ESTRATOS,
+  FACTOR_POTENCIA,
 } from "../schemas/load.schema"
 import { useCreateProjectStore } from "../store/useCreateProjectStore"
 
@@ -64,21 +64,18 @@ export function LoadDataStep() {
               <FormItem className="md:col-span-2">
                 <FormLabel>
                   Potencia total instalada{" "}
-                  <span className="text-muted-foreground">(PT)</span>
+                  <span className="text-destructive" aria-hidden="true">*</span>
                 </FormLabel>
                 <FormControl>
                   <InputWithUnit
                     type="number"
-                    step="0.0001"
-                    placeholder="0,0000"
-                    unit="kW"
+                    step="1"
+                    placeholder="0"
+                    unit="kVA"
                     {...field}
                     value={(field.value as string | number | undefined) ?? ""}
                   />
                 </FormControl>
-                <FormDescription>
-                  Sumatoria de la potencia de todos los usuarios.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -91,22 +88,29 @@ export function LoadDataStep() {
               <FormItem>
                 <FormLabel>
                   Factor de potencia{" "}
-                  <span className="text-muted-foreground">(FP)</span>
+                  <span className="text-destructive" aria-hidden="true">*</span>
                 </FormLabel>
-                <FormControl>
-                  <InputWithUnit
-                    type="number"
-                    step="0.01"
-                    min="0.5"
-                    max="1"
-                    placeholder="0,95"
-                    {...field}
-                    value={(field.value as string | number | undefined) ?? ""}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Valor entre 0,5 y 1 (típicamente 0,8 – 0,95).
-                </FormDescription>
+                <Select
+                  value={
+                    field.value !== undefined && field.value !== ""
+                      ? String(field.value)
+                      : undefined
+                  }
+                  onValueChange={(v) => field.onChange(Number(v))}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione el factor de potencia" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {FACTOR_POTENCIA.map((fp) => (
+                      <SelectItem key={fp} value={String(fp)}>
+                        {String(fp).replace(".", ",")}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -119,7 +123,7 @@ export function LoadDataStep() {
               <FormItem>
                 <FormLabel>
                   Tipo de carga{" "}
-                  <span className="text-muted-foreground">(TC)</span>
+                  <span className="text-destructive" aria-hidden="true">*</span>
                 </FormLabel>
                 <Select
                   value={field.value}
@@ -150,7 +154,7 @@ export function LoadDataStep() {
               <FormItem>
                 <FormLabel>
                   Número de usuarios{" "}
-                  <span className="text-muted-foreground">(USUARIOS)</span>
+                  <span className="text-destructive" aria-hidden="true">*</span>
                 </FormLabel>
                 <FormControl>
                   <InputWithUnit
@@ -162,7 +166,6 @@ export function LoadDataStep() {
                     value={(field.value as string | number | undefined) ?? ""}
                   />
                 </FormControl>
-                <FormDescription>Número entero de usuarios.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -175,7 +178,7 @@ export function LoadDataStep() {
               <FormItem>
                 <FormLabel>
                   Estrato{" "}
-                  <span className="text-muted-foreground">(ESTRATO)</span>
+                  <span className="text-destructive" aria-hidden="true">*</span>
                 </FormLabel>
                 <Select
                   value={

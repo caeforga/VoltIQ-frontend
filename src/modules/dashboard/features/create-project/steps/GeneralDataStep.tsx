@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -28,6 +27,8 @@ import {
   TIPO_RED_LABELS,
   TIPO_INSTALACION,
   TIPO_INSTALACION_LABELS,
+  TIPO_SISTEMA,
+  TIPO_SISTEMA_LABELS,
   DEPARTAMENTOS,
   OPERADORES_POR_DEPARTAMENTO,
 } from "../schemas/general.schema"
@@ -39,6 +40,7 @@ const DEFAULT_VALUES: Partial<GeneralDataInput> = {
   operadorRed: "",
   tipoRed: undefined,
   tipoInstalacion: undefined,
+  tipoSistema: undefined,
   nivelTensionMT: undefined,
   nivelTensionBT: undefined,
   temperaturaZona: undefined,
@@ -81,7 +83,7 @@ export function GeneralDataStep() {
             render={({ field }) => (
               <FormItem className="md:col-span-2">
                 <FormLabel>
-                  Proyecto <span className="text-muted-foreground">(PROY)</span>
+                  Proyecto <span className="text-destructive" aria-hidden="true">*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -90,9 +92,6 @@ export function GeneralDataStep() {
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>
-                  Nombre del proyecto. Hasta 100 caracteres.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -105,7 +104,7 @@ export function GeneralDataStep() {
               <FormItem>
                 <FormLabel>
                   Ubicación{" "}
-                  <span className="text-muted-foreground">(UBIC)</span>
+                  <span className="text-destructive" aria-hidden="true">*</span>
                 </FormLabel>
                 <Select
                   value={field.value}
@@ -124,9 +123,6 @@ export function GeneralDataStep() {
                     ))}
                   </SelectContent>
                 </Select>
-                <FormDescription>
-                  Departamento o ciudad del proyecto.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -139,7 +135,7 @@ export function GeneralDataStep() {
               <FormItem>
                 <FormLabel>
                   Operador de red{" "}
-                  <span className="text-muted-foreground">(OR)</span>
+                  <span className="text-destructive" aria-hidden="true">*</span>
                 </FormLabel>
                 <Select
                   value={field.value}
@@ -165,9 +161,6 @@ export function GeneralDataStep() {
                     ))}
                   </SelectContent>
                 </Select>
-                <FormDescription>
-                  Filtrado según el departamento.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -179,7 +172,7 @@ export function GeneralDataStep() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Tipo de red <span className="text-muted-foreground">(TR)</span>
+                  Tipo de red <span className="text-destructive" aria-hidden="true">*</span>
                 </FormLabel>
                 <Select
                   value={field.value}
@@ -210,7 +203,7 @@ export function GeneralDataStep() {
               <FormItem>
                 <FormLabel>
                   Tipo de instalación{" "}
-                  <span className="text-muted-foreground">(TI)</span>
+                  <span className="text-destructive" aria-hidden="true">*</span>
                 </FormLabel>
                 <Select
                   value={field.value}
@@ -241,19 +234,18 @@ export function GeneralDataStep() {
               <FormItem>
                 <FormLabel>
                   Nivel de tensión MT{" "}
-                  <span className="text-muted-foreground">(NTMT)</span>
+                  <span className="text-destructive" aria-hidden="true">*</span>
                 </FormLabel>
                 <FormControl>
                   <InputWithUnit
                     type="number"
-                    step="0.0001"
+                    step="0.1"
                     placeholder="13,2"
                     unit="kV"
                     {...field}
                     value={(field.value as string | number | undefined) ?? ""}
                   />
                 </FormControl>
-                <FormDescription>Decimal en kilovoltios.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -266,19 +258,18 @@ export function GeneralDataStep() {
               <FormItem>
                 <FormLabel>
                   Nivel de tensión BT{" "}
-                  <span className="text-muted-foreground">(NTBT)</span>
+                  <span className="text-destructive" aria-hidden="true">*</span>
                 </FormLabel>
                 <FormControl>
                   <InputWithUnit
                     type="number"
-                    step="0.0001"
+                    step="1"
                     placeholder="120"
                     unit="V"
                     {...field}
                     value={(field.value as string | number | undefined) ?? ""}
                   />
                 </FormControl>
-                <FormDescription>Decimal en voltios.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -291,19 +282,49 @@ export function GeneralDataStep() {
               <FormItem>
                 <FormLabel>
                   Temperatura promedio{" "}
-                  <span className="text-muted-foreground">(TEMP)</span>
+                  <span className="text-destructive" aria-hidden="true">*</span>
                 </FormLabel>
                 <FormControl>
                   <InputWithUnit
                     type="number"
-                    step="0.0001"
+                    step="1"
                     placeholder="17"
                     unit="°C"
                     {...field}
                     value={(field.value as string | number | undefined) ?? ""}
                   />
                 </FormControl>
-                <FormDescription>Entre -10 °C y 50 °C.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="tipoSistema"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Tipo de sistema{" "}
+                  <span className="text-destructive" aria-hidden="true">*</span>
+                </FormLabel>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione el tipo de sistema" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {TIPO_SISTEMA.map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {TIPO_SISTEMA_LABELS[t]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
