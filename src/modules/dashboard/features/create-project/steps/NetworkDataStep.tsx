@@ -1,38 +1,75 @@
-import { Button } from "@/components/ui/button"
-import { Network } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Form } from "@/components/ui/form"
+import {
+  networkSchema,
+  type NetworkData,
+  type NetworkDataInput,
+} from "../schemas/network.schema"
 import { useCreateProjectStore } from "../store/useCreateProjectStore"
+import { NodosTable } from "../network/NodosTable"
+import { LineasTable } from "../network/LineasTable"
+import { SubestacionesTable } from "../network/SubestacionesTable"
+import { CargasTable } from "../network/CargasTable"
+
+const DEFAULT_VALUES: NetworkDataInput = {
+  nodos: [],
+  lineas: [],
+  subestaciones: [],
+  cargas: [],
+}
 
 export function NetworkDataStep() {
-  const prev = useCreateProjectStore((s) => s.prev)
+  const network = useCreateProjectStore((s) => s.network)
+  const setNetwork = useCreateProjectStore((s) => s.setNetwork)
   const markCompleted = useCreateProjectStore((s) => s.markCompleted)
+  const prev = useCreateProjectStore((s) => s.prev)
 
-  const handleCreate = () => {
+  const form = useForm<NetworkDataInput, unknown, NetworkData>({
+    resolver: zodResolver(networkSchema),
+    defaultValues: {
+      ...DEFAULT_VALUES,
+      ...(network as NetworkDataInput),
+    },
+    mode: "onTouched",
+  })
+
+  const onSubmit = (data: NetworkData) => {
+    setNetwork(data)
     markCompleted("network")
     toast.success("Proyecto listo para crearse", {
       description: "La integración con backend se implementará después.",
     })
   }
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed p-12 text-center">
-        <Network className="size-10 text-muted-foreground/60" />
-        <div className="space-y-1">
-          <p className="text-sm font-medium">Topología de la red</p>
-          <p className="text-xs text-muted-foreground">
-            Aquí irán las tablas de nodos (postes), líneas (cables) y
-            transformadores que conforman la red radial.
-          </p>
-        </div>
-      </div>
+  const onInvalid = () => {
+    toast.error("Revisa los datos del formulario", {
+      description: "Hay campos faltantes o inválidos en las tablas.",
+    })
+  }
 
-      <div className="flex justify-between gap-2 pt-2">
-        <Button variant="outline" onClick={prev}>
-          Atrás
-        </Button>
-        <Button onClick={handleCreate}>Crear proyecto</Button>
-      </div>
-    </div>
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+        className="space-y-6"
+      >
+        <div className="space-y-4">
+          <NodosTable />
+          <LineasTable />
+          <SubestacionesTable />
+          <CargasTable />
+        </div>
+
+        <div className="flex justify-between gap-2 pt-2">
+          <Button type="button" variant="outline" onClick={prev}>
+            Atrás
+          </Button>
+          <Button type="submit">Crear proyecto</Button>
+        </div>
+      </form>
+    </Form>
   )
 }

@@ -70,7 +70,7 @@ export function LoadDataStep() {
                   <InputWithUnit
                     type="number"
                     step="1"
-                    placeholder="0"
+                    placeholder="60"
                     unit="kVA"
                     {...field}
                     value={(field.value as string | number | undefined) ?? ""}

@@ -1,6 +1,8 @@
 import { create } from "zustand"
+import { persist, createJSONStorage } from "zustand/middleware"
 import type { GeneralData } from "../schemas/general.schema"
 import type { LoadData } from "../schemas/load.schema"
+import type { NetworkData } from "../schemas/network.schema"
 
 export type StepId = "general" | "load" | "network"
 
@@ -11,6 +13,7 @@ type State = {
   completed: Record<StepId, boolean>
   general: Partial<GeneralData>
   load: Partial<LoadData>
+  network: Partial<NetworkData>
 }
 
 type Actions = {
@@ -19,6 +22,7 @@ type Actions = {
   prev: () => void
   setGeneral: (data: GeneralData) => void
   setLoad: (data: LoadData) => void
+  setNetwork: (data: NetworkData) => void
   markCompleted: (step: StepId) => void
   reset: () => void
 }
@@ -28,43 +32,71 @@ const initialState: State = {
   completed: { general: false, load: false, network: false },
   general: {},
   load: {},
+  network: {},
 }
 
-export const useCreateProjectStore = create<State & Actions>((set, get) => ({
-  ...initialState,
+const STORAGE_KEY = "voltiq:create-project"
 
-  setStep: (currentStep) => set({ currentStep }),
+export const useCreateProjectStore = create<State & Actions>()(
+  persist(
+    (set, get) => ({
+      ...initialState,
 
-  next: () => {
-    const { currentStep, completed } = get()
-    const idx = STEP_ORDER.indexOf(currentStep)
-    if (idx < STEP_ORDER.length - 1) {
-      set({
-        currentStep: STEP_ORDER[idx + 1],
-        completed: { ...completed, [currentStep]: true },
-      })
-    }
-  },
+      setStep: (currentStep) => set({ currentStep }),
 
-  prev: () => {
-    const idx = STEP_ORDER.indexOf(get().currentStep)
-    if (idx > 0) set({ currentStep: STEP_ORDER[idx - 1] })
-  },
+      next: () => {
+        const { currentStep, completed } = get()
+        const idx = STEP_ORDER.indexOf(currentStep)
+        if (idx < STEP_ORDER.length - 1) {
+          set({
+            currentStep: STEP_ORDER[idx + 1],
+            completed: { ...completed, [currentStep]: true },
+          })
+        }
+      },
 
-  setGeneral: (general) =>
-    set((s) => ({
-      general,
-      completed: { ...s.completed, general: true },
-    })),
+      prev: () => {
+        const idx = STEP_ORDER.indexOf(get().currentStep)
+        if (idx > 0) set({ currentStep: STEP_ORDER[idx - 1] })
+      },
 
-  setLoad: (load) =>
-    set((s) => ({
-      load,
-      completed: { ...s.completed, load: true },
-    })),
+      setGeneral: (general) =>
+        set((s) => ({
+          general,
+          completed: { ...s.completed, general: true },
+        })),
 
-  markCompleted: (step) =>
-    set((s) => ({ completed: { ...s.completed, [step]: true } })),
+      setLoad: (load) =>
+        set((s) => ({
+          load,
+          completed: { ...s.completed, load: true },
+        })),
 
-  reset: () => set(initialState),
-}))
+      setNetwork: (network) =>
+        set((s) => ({
+          network,
+          completed: { ...s.completed, network: true },
+        })),
+
+      markCompleted: (step) =>
+        set((s) => ({ completed: { ...s.completed, [step]: true } })),
+
+      reset: () => {
+        set(initialState)
+        useCreateProjectStore.persist.clearStorage()
+      },
+    }),
+    {
+      name: STORAGE_KEY,
+      storage: createJSONStorage(() => sessionStorage),
+      version: 1,
+      partialize: (state) => ({
+        currentStep: state.currentStep,
+        completed: state.completed,
+        general: state.general,
+        load: state.load,
+        network: state.network,
+      }),
+    },
+  ),
+)
