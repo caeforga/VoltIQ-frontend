@@ -89,7 +89,7 @@ export const useCreateProjectStore = create<State & Actions>()(
     {
       name: STORAGE_KEY,
       storage: createJSONStorage(() => sessionStorage),
-      version: 1,
+      version: 2,
       partialize: (state) => ({
         currentStep: state.currentStep,
         completed: state.completed,

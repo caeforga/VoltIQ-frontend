@@ -3,16 +3,17 @@ import type {
   Nodo,
   Linea,
   Subestacion,
-  Carga,
 } from "../schemas/network.schema"
 
 export type IdPrefix = "N" | "L" | "T" | "C"
+
+type WithId = { id: string }
 
 /**
  * Genera el siguiente ID con el prefijo dado tomando como base el máximo
  * existente. Ej: ["N1", "N3"] + "N" => "N4".
  */
-export function nextId(prefix: IdPrefix, rows: { id: string }[]): string {
+export function nextId(prefix: IdPrefix, rows: readonly WithId[]): string {
   const max = rows.reduce((m, r) => {
     const n = Number(String(r.id).replace(prefix, "")) || 0
     return n > m ? n : m
@@ -20,7 +21,9 @@ export function nextId(prefix: IdPrefix, rows: { id: string }[]): string {
   return `${prefix}${max + 1}`
 }
 
-export function createEmptyNodo(existing: Nodo[]): NetworkDataInput["nodos"][number] {
+export function createEmptyNodo(
+  existing: readonly WithId[],
+): NetworkDataInput["nodos"][number] {
   return {
     id: nextId("N", existing),
     descripcion: "",
@@ -31,7 +34,9 @@ export function createEmptyNodo(existing: Nodo[]): NetworkDataInput["nodos"][num
   }
 }
 
-export function createEmptyLinea(existing: Linea[]): NetworkDataInput["lineas"][number] {
+export function createEmptyLinea(
+  existing: readonly WithId[],
+): NetworkDataInput["lineas"][number] {
   return {
     id: nextId("L", existing),
     origen: "",
@@ -43,7 +48,7 @@ export function createEmptyLinea(existing: Linea[]): NetworkDataInput["lineas"][
 }
 
 export function createEmptySubestacion(
-  existing: Subestacion[],
+  existing: readonly WithId[],
 ): NetworkDataInput["subestaciones"][number] {
   return {
     id: nextId("T", existing),
@@ -53,7 +58,9 @@ export function createEmptySubestacion(
   }
 }
 
-export function createEmptyCarga(existing: Carga[]): NetworkDataInput["cargas"][number] {
+export function createEmptyCarga(
+  existing: readonly WithId[],
+): NetworkDataInput["cargas"][number] {
   return {
     id: nextId("C", existing),
     nodoId: "",

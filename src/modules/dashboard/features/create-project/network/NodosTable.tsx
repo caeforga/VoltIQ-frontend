@@ -71,7 +71,7 @@ export function NodosTable() {
               <TableHead className="min-w-56">Descripción</TableHead>
               <TableHead className="min-w-40">Tipo</TableHead>
               <TableHead className="min-w-56">Clase</TableHead>
-              <TableHead className="w-32 text-right">Voltaje (kV)</TableHead>
+              {/* <TableHead className="w-32 text-right">Voltaje (kV)</TableHead> */}
               <TableHead className="w-32 text-right">Carga (kVA)</TableHead>
               <TableHead className="w-10" aria-label="Acciones" />
             </TableRow>
@@ -111,28 +111,34 @@ export function NodosTable() {
                     <FormField
                       control={control}
                       name={`nodos.${index}.tipo`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <Select
-                            value={field.value ?? undefined}
-                            onValueChange={field.onChange}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Tipo" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {TIPO_NODO.map((t) => (
-                                <SelectItem key={t} value={t}>
-                                  {TIPO_NODO_LABELS[t]}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      render={({ field }) => {
+                        const tiposDisponibles =
+                          index === 0
+                            ? TIPO_NODO.filter((t) => t !== "CARGA")
+                            : TIPO_NODO
+                        return (
+                          <FormItem>
+                            <Select
+                              value={field.value ?? undefined}
+                              onValueChange={field.onChange}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Tipo" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {tiposDisponibles.map((t) => (
+                                  <SelectItem key={t} value={t}>
+                                    {TIPO_NODO_LABELS[t]}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )
+                      }}
                     />
                   </TableCell>
 
@@ -170,7 +176,7 @@ export function NodosTable() {
                     />
                   </TableCell>
 
-                  <TableCell>
+                  {/* <TableCell>
                     <FormField
                       control={control}
                       name={`nodos.${index}.voltajeKV`}
@@ -193,7 +199,7 @@ export function NodosTable() {
                         </FormItem>
                       )}
                     />
-                  </TableCell>
+                  </TableCell> */}
 
                   <TableCell>
                     <FormField

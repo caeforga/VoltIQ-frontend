@@ -9,10 +9,15 @@ export const ESTRATOS = [1, 2, 3, 4, 5, 6] as const
 
 export const FACTOR_POTENCIA = [0.8, 0.9, 0.95] as const
 
+export const UNIDAD_POTENCIA = ["kVA", "kW"] as const
+
 export const loadSchema = z.object({
-  potenciaTotalKW: z.coerce
+  potenciaTotal: z.coerce
     .number({ message: "Debe ser un número" })
     .positive("Debe ser mayor a 0"),
+  unidadPotencia: z.enum(UNIDAD_POTENCIA, {
+    message: "Seleccione la unidad",
+  }),
   factorPotencia: z.coerce
     .number({ message: "Seleccione el factor de potencia" })
     .refine((v) => (FACTOR_POTENCIA as readonly number[]).includes(v), {

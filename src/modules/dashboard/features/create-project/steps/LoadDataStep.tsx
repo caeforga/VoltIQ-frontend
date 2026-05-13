@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { InputWithUnit } from "../components/InputWithUnit"
+import { InputWithUnitSelect } from "../components/InputWithUnitSelect"
 import {
   loadSchema,
   type LoadData,
@@ -25,11 +26,13 @@ import {
   TIPO_CARGA_LABELS,
   ESTRATOS,
   FACTOR_POTENCIA,
+  UNIDAD_POTENCIA,
 } from "../schemas/load.schema"
 import { useCreateProjectStore } from "../store/useCreateProjectStore"
 
 const DEFAULT_VALUES: Partial<LoadDataInput> = {
-  potenciaTotalKW: undefined,
+  potenciaTotal: undefined,
+  unidadPotencia: "kVA",
   factorPotencia: undefined,
   tipoCarga: undefined,
   numeroUsuarios: undefined,
@@ -59,7 +62,7 @@ export function LoadDataStep() {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
-            name="potenciaTotalKW"
+            name="potenciaTotal"
             render={({ field }) => (
               <FormItem className="md:col-span-2">
                 <FormLabel>
@@ -67,13 +70,21 @@ export function LoadDataStep() {
                   <span className="text-destructive" aria-hidden="true">*</span>
                 </FormLabel>
                 <FormControl>
-                  <InputWithUnit
+                  <InputWithUnitSelect
                     type="number"
                     step="1"
                     placeholder="60"
-                    unit="kVA"
+                    units={UNIDAD_POTENCIA}
+                    unit={form.watch("unidadPotencia") ?? "kVA"}
+                    onUnitChange={(u) =>
+                      form.setValue(
+                        "unidadPotencia",
+                        u as (typeof UNIDAD_POTENCIA)[number],
+                        { shouldDirty: true, shouldValidate: true },
+                      )
+                    }
                     {...field}
-                    value={(field.value as string | number | undefined) ?? ""}
+                    value={field.value as string | number | undefined}
                   />
                 </FormControl>
                 <FormMessage />
