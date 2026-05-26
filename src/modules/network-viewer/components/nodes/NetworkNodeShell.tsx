@@ -2,68 +2,68 @@ import { Handle, Position } from "@xyflow/react"
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 
+export type NodeTone = "se" | "mt" | "bt" | "trafo" | "carga"
+
 type NetworkNodeShellProps = {
   selected?: boolean
-  /** Tono semántico (subestación verde, MT primario, BT cian, trafo naranja, carga rojo). */
-  tone?: "primary" | "accent" | "warning" | "destructive" | "success"
-  icon?: ReactNode
-  title: string
-  subtitle?: ReactNode
-  badges?: ReactNode
-  /** Mostrar handle superior (entrada). */
+  tone?: NodeTone
+  icon: ReactNode
+  /** ID corto en mono (N1, T3, etc.). */
+  id: string
+  /** Línea principal del label (descripción o tipo). */
+  label?: string
+  /** Línea secundaria (kV, kVA, FP, etc.). */
+  meta?: ReactNode
   hasTop?: boolean
-  /** Mostrar handle inferior (salida). */
   hasBottom?: boolean
-  /** Mostrar handles laterales (izq y der) — útil para conexiones colaterales. */
   hasSides?: boolean
-  className?: string
 }
-
-const TONE_RING: Record<NonNullable<NetworkNodeShellProps["tone"]>, string> = {
-  primary: "ring-[color:var(--primary)]",
-  accent: "ring-[color:var(--accent-foreground)]",
-  warning: "ring-amber-500",
-  destructive: "ring-[color:var(--destructive)]",
-  success: "ring-emerald-500",
-}
-
-const TONE_ACCENT: Record<NonNullable<NetworkNodeShellProps["tone"]>, string> =
-  {
-    primary: "text-[color:var(--primary)]",
-    accent: "text-[color:var(--accent-foreground)]",
-    warning: "text-amber-500",
-    destructive: "text-[color:var(--destructive)]",
-    success: "text-emerald-500",
-  }
-
-const HANDLE_STYLE = "!h-2 !w-2 !border-2 !bg-background !border-foreground/30"
 
 /**
- * Contenedor visual compartido para todos los custom nodes del editor.
- * Aplica estilos coherentes con el tema (radius, border, ring de selección)
- * y expone handles configurables.
+ * Estilo "diagrama unifilar": ícono circular + ID/etiqueta debajo, sin caja.
+ * Los handles se mantienen invisibles para permitir conexiones pero sin
+ * añadir ruido visual.
  */
+const TONE_BG: Record<NodeTone, string> = {
+  se: "bg-emerald-500/15 text-emerald-400 dark:text-emerald-300",
+  mt: "bg-primary/15 text-primary",
+  bt: "bg-cyan-500/15 text-cyan-400 dark:text-cyan-300",
+  trafo: "bg-violet-500/15 text-violet-400 dark:text-violet-300",
+  carga: "bg-rose-500/15 text-rose-400 dark:text-rose-300",
+}
+
+const TONE_BORDER: Record<NodeTone, string> = {
+  se: "border-emerald-500/40",
+  mt: "border-primary/40",
+  bt: "border-cyan-500/40",
+  trafo: "border-violet-500/40",
+  carga: "border-rose-500/40",
+}
+
+const TONE_RING: Record<NodeTone, string> = {
+  se: "ring-emerald-500",
+  mt: "ring-primary",
+  bt: "ring-cyan-500",
+  trafo: "ring-violet-500",
+  carga: "ring-rose-500",
+}
+
+const HANDLE_STYLE =
+  "!h-2 !w-2 !border-0 !bg-transparent opacity-0 transition-opacity hover:opacity-100"
+
 export function NetworkNodeShell({
   selected,
-  tone = "primary",
+  tone = "mt",
   icon,
-  title,
-  subtitle,
-  badges,
+  id,
+  label,
+  meta,
   hasTop = true,
   hasBottom = true,
   hasSides = false,
-  className,
 }: NetworkNodeShellProps) {
   return (
-    <div
-      className={cn(
-        "group relative flex min-w-[160px] items-center gap-2.5 rounded-lg border bg-card/95 px-3 py-2 shadow-sm backdrop-blur",
-        "border-border transition-shadow",
-        selected ? `ring-2 ring-offset-2 ring-offset-background ${TONE_RING[tone]}` : "hover:shadow-md",
-        className,
-      )}
-    >
+    <div className="group relative flex w-[110px] select-none flex-col items-center gap-1.5">
       {hasTop && (
         <Handle
           type="target"
@@ -90,25 +90,44 @@ export function NetworkNodeShell({
           />
         </>
       )}
-      {icon && (
+
+      <div
+        className={cn(
+          "relative grid size-12 place-items-center rounded-full border transition-all",
+          TONE_BG[tone],
+          TONE_BORDER[tone],
+          selected
+            ? cn(
+                "ring-2 ring-offset-2 ring-offset-background scale-105 shadow-lg",
+                TONE_RING[tone],
+              )
+            : "shadow-sm group-hover:shadow-md group-hover:scale-[1.03]",
+        )}
+      >
+        {icon}
+      </div>
+
+      <div className="flex max-w-[120px] flex-col items-center text-center leading-tight">
         <div
           className={cn(
-            "flex size-9 shrink-0 items-center justify-center rounded-md bg-muted",
-            TONE_ACCENT[tone],
+            "font-mono text-[11px] font-semibold tracking-wide transition-colors",
+            selected ? "text-foreground" : "text-foreground/85",
           )}
         >
-          {icon}
+          {id}
         </div>
-      )}
-      <div className="min-w-0 flex-1 leading-tight">
-        <div className="truncate text-sm font-semibold">{title}</div>
-        {subtitle && (
-          <div className="truncate text-xs text-muted-foreground">
-            {subtitle}
+        {label && (
+          <div className="line-clamp-2 text-[10px] text-muted-foreground">
+            {label}
           </div>
         )}
-        {badges && <div className="mt-1 flex flex-wrap gap-1">{badges}</div>}
+        {meta && (
+          <div className="mt-0.5 text-[10px] font-medium text-foreground/70">
+            {meta}
+          </div>
+        )}
       </div>
+
       {hasBottom && (
         <Handle
           type="source"

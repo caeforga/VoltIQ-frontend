@@ -1,14 +1,14 @@
 import {
   BaseEdge,
   getSmoothStepPath,
-  type EdgeProps,
   type Edge,
+  type EdgeProps,
 } from "@xyflow/react"
 import type { LineaVirtualFlowData } from "../../lib/networkToFlow"
 
 /**
- * Edge punteado para conexiones derivadas (nodo MT → transformador).
- * No es seleccionable ni mostrable como línea editable.
+ * Edge punteado para la conexión nodo MT → transformador.
+ * Visualmente sutil y no seleccionable.
  */
 export function LineaVirtualEdge({
   id,
@@ -34,10 +34,10 @@ export function LineaVirtualEdge({
       id={id}
       path={edgePath}
       style={{
-        stroke: "var(--muted-foreground)",
-        strokeWidth: 1.25,
-        strokeDasharray: "4 3",
-        opacity: 0.7,
+        stroke: "color-mix(in oklab, var(--muted-foreground) 70%, transparent)",
+        strokeWidth: 1.2,
+        strokeDasharray: "3 3",
+        opacity: 0.55,
       }}
     />
   )

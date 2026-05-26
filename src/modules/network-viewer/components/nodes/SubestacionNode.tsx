@@ -1,6 +1,6 @@
-import type { NodeProps, Node } from "@xyflow/react"
-import { RadioTower } from "lucide-react"
+import type { Node, NodeProps } from "@xyflow/react"
 import { NetworkNodeShell } from "./NetworkNodeShell"
+import { SubestacionSymbol } from "./symbols"
 import type { NodoFlowData } from "../../lib/networkToFlow"
 
 export function SubestacionNode({
@@ -11,10 +11,11 @@ export function SubestacionNode({
   return (
     <NetworkNodeShell
       selected={selected}
-      tone="success"
-      icon={<RadioTower className="size-5" />}
-      title={`${nodo.id} · ${nodo.descripcion || "Subestación"}`}
-      subtitle={nodo.voltajeKV ? `${nodo.voltajeKV} kV` : nodo.clase}
+      tone="se"
+      icon={<SubestacionSymbol className="size-6" />}
+      id={nodo.id}
+      label={nodo.descripcion || "Subestación"}
+      meta={nodo.voltajeKV ? `${nodo.voltajeKV} kV` : undefined}
       hasTop={false}
     />
   )

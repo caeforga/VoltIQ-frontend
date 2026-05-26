@@ -8,7 +8,17 @@ import type {
 } from "@/modules/dashboard/features/create-project/schemas/network.schema"
 
 // ──────────────────────────────────────────────────────────────────────────
-// Tipos de nodos y edges en React Flow (data adjuntada)
+// Modelo: transformadores en serie
+// ──────────────────────────────────────────────────────────────────────────
+//
+// Para cada subestación T con `nodoId = X`:
+//   - Si X tiene líneas de bajada (origen X, destino BT o CARGA), T se inserta
+//     ENTRE X y esos destinos: X -.virtual.→ T -─línea─→ Y_BT
+//   - Si no, T se renderiza colgante con una línea virtual desde X.
+//
+// El edge de la línea reescrita conserva su id (`edge:Lx`) para que la
+// selección/edición siga apuntando a la línea original del schema.
+//
 // ──────────────────────────────────────────────────────────────────────────
 
 export type FlowNodeKind = "nodo" | "transformador"
@@ -23,7 +33,6 @@ export type NodoFlowData = {
 export type TransformadorFlowData = {
   kind: "transformador"
   subestacion: Subestacion
-  /** Nodo anfitrión al que está asignado el transformador. */
   hostNodoId: string
 }
 
@@ -34,13 +43,13 @@ export type FlowEdgeKind = "linea" | "linea-virtual"
 export type LineaFlowData = {
   kind: "linea"
   linea: Linea
+  /** True cuando la línea fue remapeada para salir del transformador. */
+  remapped?: boolean
 }
 
 export type LineaVirtualFlowData = {
   kind: "linea-virtual"
-  /** id del nodo MT/anfitrión del transformador. */
   hostNodoId: string
-  /** id de la subestación (transformador). */
   transformadorId: string
 }
 
@@ -61,7 +70,6 @@ export const edgeFlowId = (lineaId: string) => `${EDGE_PREFIX}${lineaId}`
 export const virtualEdgeFlowId = (subId: string) =>
   `${VIRTUAL_EDGE_PREFIX}${subId}`
 
-/** Recupera el id original del schema desde un id de React Flow. */
 export function parseFlowId(
   id: string,
 ):
@@ -85,7 +93,7 @@ export function parseFlowId(
 }
 
 // ──────────────────────────────────────────────────────────────────────────
-// Conversión NetworkData → { nodes, edges } de React Flow
+// Helpers
 // ──────────────────────────────────────────────────────────────────────────
 
 function nodoFlowType(tipo: Nodo["tipo"]): string {
@@ -101,6 +109,13 @@ function nodoFlowType(tipo: Nodo["tipo"]): string {
   }
 }
 
+const esBT = (tipo: Nodo["tipo"] | undefined) =>
+  tipo === "NODO_BT" || tipo === "CARGA"
+
+// ──────────────────────────────────────────────────────────────────────────
+// Conversión NetworkData → { nodes, edges } de React Flow
+// ──────────────────────────────────────────────────────────────────────────
+
 export function networkToFlow(
   network: Partial<NetworkData>,
   positions: Record<string, { x: number; y: number }> = {},
@@ -110,11 +125,45 @@ export function networkToFlow(
   const subestaciones = network.subestaciones ?? []
   const cargas = network.cargas ?? []
 
+  const nodoPorId = new Map<string, Nodo>()
+  nodos.forEach((n) => {
+    if (n?.id) nodoPorId.set(n.id, n)
+  })
+
   const cargaPorNodo = new Map<string, Carga>()
   cargas.forEach((c) => {
     if (c?.nodoId) cargaPorNodo.set(c.nodoId, c)
   })
 
+  // Para cada nodo MT/SE: lista de líneas de bajada (a BT/CARGA)
+  const bajadaPorNodo = new Map<string, Linea[]>()
+  lineas.forEach((l) => {
+    if (!l?.origen || !l?.destino) return
+    const origen = nodoPorId.get(l.origen)
+    const destino = nodoPorId.get(l.destino)
+    if (!origen || !destino) return
+    if (!esBT(origen.tipo) && esBT(destino.tipo)) {
+      const lista = bajadaPorNodo.get(l.origen) ?? []
+      lista.push(l)
+      bajadaPorNodo.set(l.origen, lista)
+    }
+  })
+
+  // Mapa de líneas remapeadas: id de línea → id del transformador que la "intercepta"
+  const lineaRemapeadaPorTrafo = new Map<string, string>()
+  subestaciones.forEach((sub) => {
+    if (!sub?.id || !sub.nodoId) return
+    const bajada = bajadaPorNodo.get(sub.nodoId) ?? []
+    bajada.forEach((l) => {
+      // Si una línea ya fue tomada por otro trafo del mismo nodo, dejamos al
+      // primero (escenario raro; el usuario debería tener 1 trafo por nodo MT).
+      if (!lineaRemapeadaPorTrafo.has(l.id)) {
+        lineaRemapeadaPorTrafo.set(l.id, sub.id)
+      }
+    })
+  })
+
+  // ── Nodos ───────────────────────────────────────────────────────────────
   const nodes: Node<FlowNodeData>[] = []
 
   nodos.forEach((nodo) => {
@@ -147,16 +196,21 @@ export function networkToFlow(
     })
   })
 
+  // ── Edges ───────────────────────────────────────────────────────────────
   const edges: Edge<FlowEdgeData>[] = []
 
   lineas.forEach((linea) => {
     if (!linea?.id || !linea.origen || !linea.destino) return
+    const interceptadaPor = lineaRemapeadaPorTrafo.get(linea.id)
+    const sourceFlowId = interceptadaPor
+      ? txFlowId(interceptadaPor)
+      : nodeFlowId(linea.origen)
     edges.push({
       id: edgeFlowId(linea.id),
-      source: nodeFlowId(linea.origen),
+      source: sourceFlowId,
       target: nodeFlowId(linea.destino),
       type: "linea",
-      data: { kind: "linea", linea },
+      data: { kind: "linea", linea, remapped: !!interceptadaPor },
     })
   })
 

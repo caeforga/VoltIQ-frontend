@@ -1,8 +1,8 @@
 import dagre from "@dagrejs/dagre"
 import type { Edge, Node } from "@xyflow/react"
 
-const NODE_WIDTH = 180
-const NODE_HEIGHT = 80
+const NODE_WIDTH = 110
+const NODE_HEIGHT = 110
 
 /**
  * Calcula posiciones jerárquicas (top-bottom) con dagre.
@@ -14,7 +14,7 @@ export function autoLayout<T extends Node, E extends Edge>(
   edges: readonly E[],
   options: { rankdir?: "TB" | "LR"; ranksep?: number; nodesep?: number } = {},
 ): T[] {
-  const { rankdir = "TB", ranksep = 120, nodesep = 90 } = options
+  const { rankdir = "TB", ranksep = 140, nodesep = 70 } = options
 
   const g = new dagre.graphlib.Graph({ multigraph: true })
   g.setDefaultEdgeLabel(() => ({}))

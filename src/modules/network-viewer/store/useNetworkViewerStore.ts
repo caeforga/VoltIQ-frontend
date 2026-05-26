@@ -11,6 +11,8 @@ type State = {
   selectedId: string | null
   selectedKind: SelectedKind | null
   showLabels: boolean
+  /** Contador que el canvas observa para disparar un re-layout dagre. */
+  relayoutTick: number
 }
 
 type Actions = {
@@ -19,6 +21,7 @@ type Actions = {
   clearPositions: () => void
   select: (id: string | null, kind: SelectedKind | null) => void
   toggleLabels: () => void
+  requestRelayout: () => void
   reset: () => void
 }
 
@@ -27,6 +30,7 @@ const initialState: State = {
   selectedId: null,
   selectedKind: null,
   showLabels: true,
+  relayoutTick: 0,
 }
 
 export const useNetworkViewerStore = create<State & Actions>()(
@@ -46,6 +50,9 @@ export const useNetworkViewerStore = create<State & Actions>()(
       select: (selectedId, selectedKind) => set({ selectedId, selectedKind }),
 
       toggleLabels: () => set((s) => ({ showLabels: !s.showLabels })),
+
+      requestRelayout: () =>
+        set((s) => ({ relayoutTick: s.relayoutTick + 1 })),
 
       reset: () => set(initialState),
     }),
