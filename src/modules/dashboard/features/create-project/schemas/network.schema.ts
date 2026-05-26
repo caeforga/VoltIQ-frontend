@@ -26,13 +26,22 @@ export const CLASES_POR_TIPO_NODO: Record<
 > = {
   SUBESTACION: ["SUBESTACION PRINCIPAL S/E"],
   NODO_MT: [
-    "POSTE DE FIBRA DE VIDRIO DE 14M",
-    "POSTE DE CONCRETO DE 12M X 750KG",
     "POSTE DE CONCRETO DE 12M X 510KG",
+    "POSTE DE CONCRETO DE 12M X 750KG",
+    "POSTE DE CONCRETO DE 12M X 1050KG",
+    "POSTE DE FIBRA DE VIDRIO DE 12M X 510KG",
+    "POSTE DE FIBRA DE VIDRIO DE 14M X 750KG",
+    "POSTE DE FIBRA DE VIDRIO DE 12M X 1050KG",
+    "POSTE METALICO DE 12M X 510KG",
+    "POSTE METALICO DE 12M X 750KG",
+    "POSTE METALICO DE 12M X 1050KG",
   ],
   NODO_BT: [
-    "POSTE METALICO DE 8M X 510KG",
     "POSTE DE CONCRETO DE 8M X 510KG",
+    "POSTE DE CONCRETO DE 8M X 750KG",
+    "POSTE DE CONCRETO DE 8M X 1050KG",
+    "POSTE DE CONCRETO DE 10M X 510KG",
+    "POSTE METALICO DE 8M X 510KG",
   ],
   CARGA: [
     "ESTRATO 1",
@@ -53,12 +62,39 @@ export const RED_FASES_LABELS: Record<(typeof RED_FASES)[number], string> = {
   "3F": "Trifásica (3F)",
 }
 
-export const CONDUCTORES = [
-  "CABLE ACSR CALIBRE 2 - 3F",
-  "CABLE ACSR CALIBRE 4 - 3F",
-  "CABLE ACSR CALIBRE 4 - 2F",
-  "CABLE TRENZADO ALUMINIO - 1F",
-] as const
+export const NIVEL_TENSION = ["MT", "BT"] as const
+export const TIPO_CABLE = ["ABIERTA", "TRENZADA"] as const
+
+export type Conductor = {
+  id: string
+  label: string
+  /** Niveles donde aplica el conductor: MT, BT o ambos. */
+  niveles: ReadonlyArray<(typeof NIVEL_TENSION)[number]>
+  tipoCable: (typeof TIPO_CABLE)[number]
+}
+
+/**
+ * Catálogo de conductores. Reglas tomadas del Excel:
+ * - MT (aéreo) → solo RED ABIERTA (cables ACSR).
+ * - BT (aéreo) → RED ABIERTA (ACSR) o RED TRENZADA (cuádruplex/tríplex).
+ * Los conductores ACSR aplican a ambos niveles.
+ */
+export const CONDUCTORES: readonly Conductor[] = [
+  // RED ABIERTA - ACSR (aplican a MT y BT)
+  { id: "ACSR_2",   label: "CABLE ACSR CALIBRE No. 2",   niveles: ["MT", "BT"], tipoCable: "ABIERTA" },
+  { id: "ACSR_1_0", label: "CABLE ACSR CALIBRE No. 1/0", niveles: ["MT", "BT"], tipoCable: "ABIERTA" },
+  { id: "ACSR_2_0", label: "CABLE ACSR CALIBRE No. 2/0", niveles: ["MT", "BT"], tipoCable: "ABIERTA" },
+  // RED TRENZADA - CUÁDRUPLEX (solo BT)
+  { id: "TRZ_CUAD_3X2_2",         label: "CABLE TRENZADO CUADRUPLEX 3X2+2",         niveles: ["BT"], tipoCable: "TRENZADA" },
+  { id: "TRZ_CUAD_3X1_0_1X1_0",   label: "CABLE TRENZADO CUADRUPLEX 3X1/0+1x1/0",   niveles: ["BT"], tipoCable: "TRENZADA" },
+  { id: "TRZ_CUAD_3X2_0_1_0",     label: "CABLE TRENZADO CUADRUPLEX 3x2/0+1/0",     niveles: ["BT"], tipoCable: "TRENZADA" },
+  { id: "TRZ_CUAD_3X2_0_2_0",     label: "CABLE TRENZADO CUADRUPLEX 3x2/0+2/0",     niveles: ["BT"], tipoCable: "TRENZADA" },
+  { id: "TRZ_CUAD_3X4_0_4_0",     label: "CABLE TRENZADO CUADRUPLEX 3X4/0+4/0",     niveles: ["BT"], tipoCable: "TRENZADA" },
+  // RED TRENZADA - TRÍPLEX (solo BT)
+  { id: "TRZ_TRIP_2X2_1X2",       label: "CABLE TRENZADO TRIPLEX 2X2+1x2",          niveles: ["BT"], tipoCable: "TRENZADA" },
+  { id: "TRZ_TRIP_2X1_0_1_0",     label: "CABLE TRENZADO TRIPLEX 2X1/0+1/0",        niveles: ["BT"], tipoCable: "TRENZADA" },
+  { id: "TRZ_TRIP_2X2_0_2_0",     label: "CABLE TRENZADO TRIPLEX 2X2/0+2/0",        niveles: ["BT"], tipoCable: "TRENZADA" },
+]
 
 export type TipoTransformador = {
   id: string
@@ -67,13 +103,22 @@ export type TipoTransformador = {
   fases: "MONO" | "TRI"
 }
 
+/**
+ * Transformadores tipo poste según el catálogo del Excel.
+ * Monofásicos: 5, 10, 15, 25, 37.5, 50 kVA.
+ * Trifásicos: 15, 30, 45, 75 kVA.
+ */
 export const TIPOS_TRANSFORMADOR: readonly TipoTransformador[] = [
-  { id: "MONO_25",   label: "Monofásico 25 kVA",   kva: 25,    fases: "MONO" },
-  { id: "MONO_37_5", label: "Monofásico 37,5 kVA", kva: 37.5,  fases: "MONO" },
-  { id: "MONO_50",   label: "Monofásico 50 kVA",   kva: 50,    fases: "MONO" },
-  { id: "TRI_45",    label: "Trifásico 45 kVA",    kva: 45,    fases: "TRI"  },
-  { id: "TRI_75",    label: "Trifásico 75 kVA",    kva: 75,    fases: "TRI"  },
-  { id: "TRI_112_5", label: "Trifásico 112,5 kVA", kva: 112.5, fases: "TRI"  },
+  { id: "MONO_5",    label: "TRANSFORMADOR MONOFASICO TIPO POSTE DE 5 KVA",    kva: 5,    fases: "MONO" },
+  { id: "MONO_10",   label: "TRANSFORMADOR MONOFASICO TIPO POSTE DE 10 KVA",   kva: 10,   fases: "MONO" },
+  { id: "MONO_15",   label: "TRANSFORMADOR MONOFASICO TIPO POSTE DE 15 KVA",   kva: 15,   fases: "MONO" },
+  { id: "MONO_25",   label: "TRANSFORMADOR MONOFASICO TIPO POSTE DE 25 KVA",   kva: 25,   fases: "MONO" },
+  { id: "MONO_37_5", label: "TRANSFORMADOR MONOFASICO TIPO POSTE DE 37,5 KVA", kva: 37.5, fases: "MONO" },
+  { id: "MONO_50",   label: "TRANSFORMADOR MONOFASICO TIPO POSTE DE 50 KVA",   kva: 50,   fases: "MONO" },
+  { id: "TRI_15",    label: "TRANSFORMADOR TRIFASICO TIPO POSTE DE 15 KVA",    kva: 15,   fases: "TRI"  },
+  { id: "TRI_30",    label: "TRANSFORMADOR TRIFASICO TIPO POSTE DE 30 KVA",    kva: 30,   fases: "TRI"  },
+  { id: "TRI_45",    label: "TRANSFORMADOR TRIFASICO TIPO POSTE DE 45 KVA",    kva: 45,   fases: "TRI"  },
+  { id: "TRI_75",    label: "TRANSFORMADOR TRIFASICO TIPO POSTE DE 75 KVA",    kva: 75,   fases: "TRI"  },
 ]
 
 export const VOLTAJES_TRANSFORMADOR = [
@@ -84,10 +129,39 @@ export const VOLTAJES_TRANSFORMADOR = [
 ] as const
 
 // ──────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ──────────────────────────────────────────────────────────────────────────
+
+/**
+ * Deriva el nivel de tensión de una línea a partir de los tipos de sus
+ * nodos. Si involucra BT o CARGA → "BT"; si solo MT/SUBESTACION → "MT".
+ * Devuelve null si falta alguno de los nodos.
+ */
+export function nivelDeLinea(
+  origen: { tipo?: (typeof TIPO_NODO)[number] } | undefined,
+  destino: { tipo?: (typeof TIPO_NODO)[number] } | undefined,
+): (typeof NIVEL_TENSION)[number] | null {
+  if (!origen?.tipo || !destino?.tipo) return null
+  const involucraBT = [origen.tipo, destino.tipo].some(
+    (t) => t === "NODO_BT" || t === "CARGA",
+  )
+  return involucraBT ? "BT" : "MT"
+}
+
+/** Conductores aplicables a un nivel dado. */
+export function conductoresPara(
+  nivel: (typeof NIVEL_TENSION)[number] | null,
+): readonly Conductor[] {
+  if (!nivel) return CONDUCTORES
+  return CONDUCTORES.filter((c) => c.niveles.includes(nivel))
+}
+
+// ──────────────────────────────────────────────────────────────────────────
 // SCHEMAS Zod
 // ──────────────────────────────────────────────────────────────────────────
 
 const tipoTransformadorIds = TIPOS_TRANSFORMADOR.map((t) => t.id)
+const conductorIds = CONDUCTORES.map((c) => c.id)
 
 const nodoSchema = z.object({
   id: z.string().min(1),
@@ -97,9 +171,12 @@ const nodoSchema = z.object({
     .max(100, "Máximo 100 caracteres"),
   tipo: z.enum(TIPO_NODO, { message: "Seleccione el tipo" }),
   clase: z.string().min(1, "Seleccione la clase"),
+  // Voltaje opcional: el nivel del sistema se define en el paso 1 (general)
+  // y el voltaje de salida del trafo se define en SubestacionesTable.
   voltajeKV: z.coerce
     .number({ message: "Debe ser un número" })
-    .positive("Debe ser mayor a 0"),
+    .positive("Debe ser mayor a 0")
+    .optional(),
   cargaKVA: z.coerce
     .number({ message: "Debe ser un número" })
     .min(0, "No puede ser negativo"),
@@ -113,7 +190,12 @@ const lineaSchema = z
     longitudM: z.coerce
       .number({ message: "Debe ser un número" })
       .positive("Debe ser mayor a 0"),
-    conductor: z.enum(CONDUCTORES, { message: "Seleccione el conductor" }),
+    conductor: z
+      .string()
+      .min(1, "Seleccione el conductor")
+      .refine((v) => conductorIds.includes(v), {
+        message: "Conductor no válido",
+      }),
     red: z.enum(RED_FASES, { message: "Seleccione el tipo de red" }),
   })
   .refine((l) => l.origen !== l.destino, {
@@ -163,6 +245,8 @@ export const networkSchema = z
       data.nodos.filter((n) => n.tipo === "CARGA").map((n) => n.id),
     )
 
+    const nodoPorId = new Map(data.nodos.map((n) => [n.id, n]))
+
     data.lineas.forEach((l, i) => {
       if (l.origen && !idsNodos.has(l.origen)) {
         ctx.addIssue({
@@ -177,6 +261,24 @@ export const networkSchema = z
           path: ["lineas", i, "destino"],
           message: "El nodo destino no existe",
         })
+      }
+
+      const nivel = nivelDeLinea(
+        nodoPorId.get(l.origen),
+        nodoPorId.get(l.destino),
+      )
+      if (nivel && l.conductor) {
+        const conductor = CONDUCTORES.find((c) => c.id === l.conductor)
+        if (conductor && !conductor.niveles.includes(nivel)) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["lineas", i, "conductor"],
+            message:
+              nivel === "MT"
+                ? "MT solo admite cables ACSR (red abierta)"
+                : "El conductor no aplica a baja tensión",
+          })
+        }
       }
     })
 

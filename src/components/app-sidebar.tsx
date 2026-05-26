@@ -14,7 +14,7 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
-import { FolderGit2, HousePlugIcon } from "lucide-react"
+import { FolderGit2, HousePlugIcon, Network } from "lucide-react"
 
 const data = {
   user: {
@@ -36,6 +36,14 @@ const data = {
       url: "/my-projects",
       icon: (
         <FolderGit2
+        />
+      ),
+    },
+    {
+      title: "Editor de red",
+      url: "/network",
+      icon: (
+        <Network
         />
       ),
     }

@@ -29,7 +29,6 @@ export function createEmptyNodo(
     descripcion: "",
     tipo: undefined as unknown as Nodo["tipo"],
     clase: "",
-    voltajeKV: undefined as unknown as number,
     cargaKVA: 0,
   }
 }

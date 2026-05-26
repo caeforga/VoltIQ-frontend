@@ -23,6 +23,8 @@ type Actions = {
   setGeneral: (data: GeneralData) => void
   setLoad: (data: LoadData) => void
   setNetwork: (data: NetworkData) => void
+  /** Actualiza network sin marcar el paso como completado (uso del editor). */
+  updateNetwork: (patch: Partial<NetworkData>) => void
   markCompleted: (step: StepId) => void
   reset: () => void
 }
@@ -76,6 +78,11 @@ export const useCreateProjectStore = create<State & Actions>()(
         set((s) => ({
           network,
           completed: { ...s.completed, network: true },
+        })),
+
+      updateNetwork: (patch) =>
+        set((s) => ({
+          network: { ...s.network, ...patch },
         })),
 
       markCompleted: (step) =>

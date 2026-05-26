@@ -4,6 +4,7 @@ import ErrorPage from "@/shared/components/ErrorPage";
 import Login from "@/modules/auth/components/Login";
 import Home from "@/modules/dashboard/pages/Home";
 import Projects from "@/modules/dashboard/pages/Projects";
+import { NetworkViewer } from "@/modules/network-viewer/pages/NetworkViewer";
 
 const router = createBrowserRouter([
     {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
             {
                 path: "/my-projects",
                 element: <Projects />,
+            },
+            {
+                path: "/network",
+                element: <NetworkViewer />,
             },
         ],
     }

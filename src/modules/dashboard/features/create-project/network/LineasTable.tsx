@@ -31,9 +31,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
-  CONDUCTORES,
   RED_FASES,
   RED_FASES_LABELS,
+  conductoresPara,
+  nivelDeLinea,
   type NetworkDataInput,
 } from "../schemas/network.schema"
 import { createEmptyLinea } from "./helpers"
@@ -89,29 +90,35 @@ export function LineasTable() {
                   <FormField
                     control={control}
                     name={`lineas.${index}.origen`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <Select
-                          value={field.value ?? undefined}
-                          onValueChange={field.onChange}
-                          disabled={nodosIds.length === 0}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Origen" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {nodosIds.map((id) => (
-                              <SelectItem key={id} value={id}>
-                                {id}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      const destinoActual = lineas[index]?.destino
+                      const opciones = nodosIds.filter(
+                        (id) => id !== destinoActual,
+                      )
+                      return (
+                        <FormItem>
+                          <Select
+                            value={field.value ?? undefined}
+                            onValueChange={field.onChange}
+                            disabled={nodosIds.length === 0}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Origen" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {opciones.map((id) => (
+                                <SelectItem key={id} value={id}>
+                                  {id}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }}
                   />
                 </TableCell>
 
@@ -119,29 +126,35 @@ export function LineasTable() {
                   <FormField
                     control={control}
                     name={`lineas.${index}.destino`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <Select
-                          value={field.value ?? undefined}
-                          onValueChange={field.onChange}
-                          disabled={nodosIds.length === 0}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Destino" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {nodosIds.map((id) => (
-                              <SelectItem key={id} value={id}>
-                                {id}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      const origenActual = lineas[index]?.origen
+                      const opciones = nodosIds.filter(
+                        (id) => id !== origenActual,
+                      )
+                      return (
+                        <FormItem>
+                          <Select
+                            value={field.value ?? undefined}
+                            onValueChange={field.onChange}
+                            disabled={nodosIds.length === 0}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Destino" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {opciones.map((id) => (
+                                <SelectItem key={id} value={id}>
+                                  {id}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }}
                   />
                 </TableCell>
 
@@ -174,28 +187,46 @@ export function LineasTable() {
                   <FormField
                     control={control}
                     name={`lineas.${index}.conductor`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <Select
-                          value={field.value ?? undefined}
-                          onValueChange={field.onChange}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Conductor" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {CONDUCTORES.map((c) => (
-                              <SelectItem key={c} value={c}>
-                                {c}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      const fila = lineas[index]
+                      const nodoOrigen = nodos.find(
+                        (n) => n?.id === fila?.origen,
+                      )
+                      const nodoDestino = nodos.find(
+                        (n) => n?.id === fila?.destino,
+                      )
+                      const nivel = nivelDeLinea(nodoOrigen, nodoDestino)
+                      const opciones = conductoresPara(nivel)
+                      return (
+                        <FormItem>
+                          <Select
+                            value={field.value ?? undefined}
+                            onValueChange={field.onChange}
+                            disabled={!nivel}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue
+                                  placeholder={
+                                    nivel
+                                      ? `Conductor (${nivel})`
+                                      : "Seleccione origen y destino"
+                                  }
+                                />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {opciones.map((c) => (
+                                <SelectItem key={c.id} value={c.id}>
+                                  {c.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }}
                   />
                 </TableCell>
 

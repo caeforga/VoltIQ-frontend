@@ -1,5 +1,7 @@
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
@@ -9,6 +11,7 @@ import {
   type NetworkDataInput,
 } from "../schemas/network.schema"
 import { useCreateProjectStore } from "../store/useCreateProjectStore"
+import { useNetworkViewerStore } from "@/modules/network-viewer/store/useNetworkViewerStore"
 import { NodosTable } from "../network/NodosTable"
 import { LineasTable } from "../network/LineasTable"
 import { SubestacionesTable } from "../network/SubestacionesTable"
@@ -24,8 +27,11 @@ const DEFAULT_VALUES: NetworkDataInput = {
 export function NetworkDataStep() {
   const network = useCreateProjectStore((s) => s.network)
   const setNetwork = useCreateProjectStore((s) => s.setNetwork)
+  const updateNetwork = useCreateProjectStore((s) => s.updateNetwork)
   const markCompleted = useCreateProjectStore((s) => s.markCompleted)
   const prev = useCreateProjectStore((s) => s.prev)
+  const resetViewerPositions = useNetworkViewerStore((s) => s.clearPositions)
+  const navigate = useNavigate()
 
   const form = useForm<NetworkDataInput, unknown, NetworkData>({
     resolver: zodResolver(networkSchema),
@@ -36,12 +42,24 @@ export function NetworkDataStep() {
     mode: "onTouched",
   })
 
+  // Backup en vivo: cada cambio del formulario persiste en el store
+  // (sessionStorage) para no perder datos al recargar la página.
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      updateNetwork(values as Partial<NetworkData>)
+    })
+    return () => subscription.unsubscribe()
+  }, [form, updateNetwork])
+
   const onSubmit = (data: NetworkData) => {
     setNetwork(data)
     markCompleted("network")
-    toast.success("Proyecto listo para crearse", {
-      description: "La integración con backend se implementará después.",
+    // Limpiar posiciones previas para forzar auto-layout con la red recién creada
+    resetViewerPositions()
+    toast.success("Proyecto creado", {
+      description: "Abriendo el editor visual de red…",
     })
+    navigate("/network")
   }
 
   const onInvalid = () => {

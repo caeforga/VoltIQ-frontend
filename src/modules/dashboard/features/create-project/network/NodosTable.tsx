@@ -71,7 +71,6 @@ export function NodosTable() {
               <TableHead className="min-w-56">Descripción</TableHead>
               <TableHead className="min-w-40">Tipo</TableHead>
               <TableHead className="min-w-56">Clase</TableHead>
-              {/* <TableHead className="w-32 text-right">Voltaje (kV)</TableHead> */}
               <TableHead className="w-32 text-right">Carga (kVA)</TableHead>
               <TableHead className="w-10" aria-label="Acciones" />
             </TableRow>
@@ -175,31 +174,6 @@ export function NodosTable() {
                       )}
                     />
                   </TableCell>
-
-                  {/* <TableCell>
-                    <FormField
-                      control={control}
-                      name={`nodos.${index}.voltajeKV`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              step="0.0001"
-                              placeholder="13,2"
-                              className="text-right"
-                              {...field}
-                              value={
-                                (field.value as string | number | undefined) ??
-                                ""
-                              }
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TableCell> */}
 
                   <TableCell>
                     <FormField
